@@ -26,5 +26,4 @@ public class DomainConfig {
     public void addServer(ServerConfig server) {
         servers.add(server);
     }
-
 }

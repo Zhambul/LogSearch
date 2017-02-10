@@ -1,0 +1,8 @@
+<weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app">
+
+    <virtual-directory-mapping>
+        <local-path>/Users/zhambyl/Desktop/test/res</local-path>
+        <url-pattern>*</url-pattern>
+    </virtual-directory-mapping>
+    <context-root>out</context-root>
+</weblogic-web-app>
