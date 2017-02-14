@@ -24,17 +24,13 @@ public class SearchResult {
 
     public SearchResult merge(SearchResult toAppend) {
         List<LogEntry> newLogs = new ArrayList<>(logs);
-        //todo unique, sorted by date
+        //todo sorted by date
         newLogs.addAll(toAppend.getLogs());
         return new SearchResult(newLogs);
     }
 
     public List<LogEntry> getLogs() {
         return logs;
-    }
-
-    public static SearchResult empty() {
-        return new SearchResult(new ArrayList<>());
     }
 
     @Override

@@ -11,5 +11,7 @@ import java.io.File;
 @Local
 public interface SearchResultSaver {
 
-    File save(SearchResult searchResult, FileType fileType, String fileName);
+    String save(SearchResult searchResult, FileType fileType);
+
+    File getByName(String name);
 }

@@ -13,7 +13,6 @@ import javax.ejb.Stateless;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,9 +35,24 @@ public class LocalSearchableFabric implements SearchableFabric {
     @EJB
     private PathResolver pathResolver;
 
+    public LocalSearchableFabric() {
+    }
+
+    /*
+    * Constructor fot tests
+    * */
+    public LocalSearchableFabric(DomainConfigConverter domainConfigConverter,
+                                 InStrToLogEntriesConverter logEntryConverter,
+                                 PathResolver pathResolver) {
+        this.domainConfigConverter = Objects.requireNonNull(domainConfigConverter);
+        this.logEntryConverter = Objects.requireNonNull(logEntryConverter);
+        this.pathResolver = Objects.requireNonNull(pathResolver);
+    }
+
+
     @PostConstruct
     public void init() {
-        domainConfig = domainConfigConverter.convert(pathResolver.configPath());
+        domainConfig = domainConfigConverter.convert(pathResolver.domainConfigPath());
     }
 
     @Override
@@ -91,8 +105,7 @@ public class LocalSearchableFabric implements SearchableFabric {
     }
 
     private Searchable createServer(String name) {
-        Path serverPath = Paths.get(pathResolver.serverLogsPath(name));
-        List<Searchable> logFiles = listLogFiles(serverPath);
+        List<Searchable> logFiles = listLogFiles(pathResolver.serverLogsPath(name));
         return new SearchablePool(logFiles);
     }
 
@@ -124,21 +137,5 @@ public class LocalSearchableFabric implements SearchableFabric {
         if (serverConf == null) {
             throw new IllegalArgumentException("no such server (" + name + ")");
         }
-    }
-
-
-    /*
-        Setters for tests
-    */
-    public void setDomainConfigConverter(DomainConfigConverter domainConfigConverter) {
-        this.domainConfigConverter = domainConfigConverter;
-    }
-
-    public void setLogEntryConverter(InStrToLogEntriesConverter logEntryConverter) {
-        this.logEntryConverter = logEntryConverter;
-    }
-
-    public void setPathResolver(PathResolver pathResolver) {
-        this.pathResolver = pathResolver;
     }
 }

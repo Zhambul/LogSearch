@@ -1,6 +1,11 @@
 package ru.zhambul.logsearch.service;
 
+import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
 
 /**
  * Created by zhambyl on 10/02/2017.
@@ -8,28 +13,39 @@ import javax.ejb.Stateless;
 @Stateless
 public class PathResolverImpl implements PathResolver {
 
-    private final static String DEFAULT_PATH = "/Users/zhambyl/app_server/fmw_12/wls12212/" +
-            "user_projects/domains/base_domain/";
+    private String domainPath;
 
-    private final String path;
+    @EJB
+    private ResourceReader resourceReader;
 
     public PathResolverImpl() {
-        //todo read from properties
-        path = DEFAULT_PATH;
+    }
+
+    /*
+    * Constructor fot tests
+    * */
+    public PathResolverImpl(ResourceReader resourceReader) {
+        this.resourceReader = Objects.requireNonNull(resourceReader);
+    }
+
+    @PostConstruct
+    public void init() {
+        domainPath = resourceReader.read("domainPath");
     }
 
     @Override
-    public String domainPath() {
-        return path;
+    public Path domainPath() {
+        return Paths.get(domainPath);
     }
 
     @Override
-    public String serverLogsPath(String serverName) {
-        return path + "servers/" + serverName + "/logs";
+    public Path serverLogsPath(String serverName) {
+        return Paths.get(domainPath + "servers/" + serverName + "/logs");
     }
 
     @Override
-    public String configPath() {
-        return path + "config/config.xml";
+    public Path domainConfigPath() {
+        return Paths.get(domainPath + "config/config.xml");
     }
+
 }

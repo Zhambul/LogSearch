@@ -1,4 +1,4 @@
-package ru.zhambul.logsearch.api;
+package ru.zhambul.logsearch.api.search;
 
 import ru.zhambul.logsearch.service.*;
 import ru.zhambul.logsearch.type.SearchResult;

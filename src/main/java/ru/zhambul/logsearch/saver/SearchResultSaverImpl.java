@@ -4,9 +4,12 @@ import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
+import ru.zhambul.logsearch.service.ResourceReader;
 import ru.zhambul.logsearch.type.LogEntry;
 import ru.zhambul.logsearch.type.SearchResult;
 
+import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -17,6 +20,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.util.Objects;
+import java.util.Random;
 
 /**
  * Created by zhambyl on 02/02/2017.
@@ -24,44 +28,75 @@ import java.util.Objects;
 @Stateless
 public class SearchResultSaverImpl implements SearchResultSaver {
 
-    private final String savePath;
-    private final String xslPath;
+    private String savePath;
+    private String xslPath;
 
-    private static final XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
+    private final static XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
     private final static FopFactory fopFactory = FopFactory.newInstance(new File("").toURI());
 
+    @EJB
+    private ResourceReader resourceReader;
+
     public SearchResultSaverImpl() {
-        this("/Users/zhambyl/Desktop/test/res", "/Users/zhambyl/Desktop/test/xsl");
     }
 
-    public SearchResultSaverImpl(String savePath, String xslPath) {
-        checkDirectory(savePath);
-        checkDirectory(xslPath);
+    /*
+    * Constructor fot tests
+    * */
+    public SearchResultSaverImpl(ResourceReader resourceReader) {
+        this.resourceReader = Objects.requireNonNull(resourceReader);
+    }
+
+    @PostConstruct
+    public void init() {
+        String savePath = resourceReader.read("savePath");
+        String xslPath = resourceReader.read("xslPath");
+
+        requireDirExist(savePath);
+        requireDirExist(xslPath);
 
         this.savePath = savePath;
         this.xslPath = xslPath;
     }
 
-    private void checkDirectory(String path) {
-        File file = new File(path);
-        if (!file.exists() || !file.isDirectory()) {
-            throw new IllegalArgumentException("directory " + path + " is not found");
-        }
+    @Override
+    public String save(SearchResult searchResult, FileType fileType) {
+        Objects.requireNonNull(searchResult);
+        Objects.requireNonNull(fileType);
+
+        String fileName = generateFileName(fileType);
+        save(searchResult, fileType, fileName);
+        return fileName;
     }
 
     @Override
-    public File save(SearchResult searchResult, FileType fileType, String fileName) {
-        Objects.requireNonNull(searchResult);
-        Objects.requireNonNull(fileType);
-        Objects.requireNonNull(fileName);
-
-        File resultFile = createResultFile(fileType, fileName);
-        save(searchResult, fileType, resultFile);
-        return resultFile;
+    public File getByName(String name) {
+        Objects.requireNonNull(name);
+        return new File(savePath, name);
     }
 
-    private void save(SearchResult searchResult, FileType fileType, File resultFile) {
+    private void requireDirExist(String path) {
+        requireDirExist(new File(path));
+    }
+
+    private void requireDirExist(File file) {
+        if (!file.exists() || !file.isDirectory()) {
+            throw new IllegalArgumentException("directory " + file.getPath() + " is not found");
+        }
+    }
+
+    private String generateFileName(FileType fileType) {
+        StringBuilder builder = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) {
+            builder.append(random.nextInt(10));
+        }
+        return builder.toString() + "." + fileType.extension();
+    }
+
+    private void save(SearchResult searchResult, FileType fileType, String fileName) {
         try {
+            File resultFile = new File(savePath, fileName);
             switch (fileType) {
                 case XML:
                     saveAsXML(searchResult, resultFile);
@@ -94,14 +129,6 @@ public class SearchResultSaverImpl implements SearchResultSaver {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private File createResultFile(FileType fileType, String fileName) {
-        File resultFile = new File(savePath, fileName + "." + fileType.extension());
-        if (resultFile.exists()) {
-            throw new IllegalStateException("file with name " + resultFile.getName() + " already exists");
-        }
-        return resultFile;
     }
 
     private void saveWithXSLT(File resultFile, File tempXmlFile, File xslFile)

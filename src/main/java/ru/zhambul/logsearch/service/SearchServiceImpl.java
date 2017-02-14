@@ -17,15 +17,21 @@ public class SearchServiceImpl implements SearchService {
     @EJB
     private SearchableFabric fabric;
 
+    public SearchServiceImpl() {
+    }
+
+    /*
+    * Constructor fot tests
+    * */
+    public SearchServiceImpl(SearchableFabric fabric) {
+        this.fabric = Objects.requireNonNull(fabric);
+    }
+
     @Override
     public SearchResult search(SearchQuery query) {
         Objects.requireNonNull(query);
         Searchable searchable = fabric.create(query.getTargetType(), query.getTargetName());
         return searchable.search(query.getParams());
-    }
-
-    public void setFabric(SearchableFabric fabric) {
-        this.fabric = fabric;
     }
 }
 

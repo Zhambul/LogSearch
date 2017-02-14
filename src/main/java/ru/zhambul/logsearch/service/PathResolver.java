@@ -1,6 +1,7 @@
 package ru.zhambul.logsearch.service;
 
 import javax.ejb.Local;
+import java.nio.file.Path;
 
 /**
  * Created by zhambyl on 10/02/2017.
@@ -8,9 +9,9 @@ import javax.ejb.Local;
 @Local
 public interface PathResolver {
 
-    String domainPath();
+    Path domainPath();
 
-    String serverLogsPath(String serverName);
+    Path serverLogsPath(String serverName);
 
-    String configPath();
+    Path domainConfigPath();
 }

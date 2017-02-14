@@ -24,18 +24,29 @@
 //
 //    @Before
 //    public void setUp() throws Exception {
-//        SearchServiceImpl searchService = new SearchServiceImpl();
-//        LocalSearchableFabric searchableFabric = new LocalSearchableFabric();
-//        InStrToLogEntriesConverter converter = new InStrToLogEntriesConverter();
-//        converter.setIn(new InStrToStringConverter());
-//        converter.setOut(new StringToLogEntriesConverter());
-//        searchableFabric.setLogEntryConverter(converter);
-//        searchableFabric.setPathResolver(new PathResolverImpl());
-//        searchableFabric.setDomainConfigConverter(new DomainConfigConverter());
-//        searchableFabric.init();
-//        searchService.setFabric(searchableFabric);
 //
-//        this.searchService = searchService;
+//        InStrToLogEntriesConverter converter = new InStrToLogEntriesConverter(
+//                new InStrToStringConverter(),
+//                new StringToLogEntriesConverter());
+//
+//        ResourceReader resourceReader = new ResourceReaderImpl();
+//
+//        PathResolverImpl pathResolver =
+//                new PathResolverImpl(resourceReader);
+//
+//        pathResolver.init();
+//
+//        LocalSearchableFabric fabric = new LocalSearchableFabric(
+//                new DomainConfigConverter(),
+//                converter,
+//                pathResolver
+//        );
+//
+//        fabric.init();
+//
+//        searchService = new SearchServiceImpl(
+//                fabric
+//        );
 //    }
 //
 //    @Test
@@ -46,7 +57,6 @@
 //        SearchResult result = searchService.search(query);
 //        List<LogEntry> logs = result.getLogs();
 //        System.out.println(logs.size());
-//        System.out.println(logs.get(0));
 //    }
 //
 //    @Test

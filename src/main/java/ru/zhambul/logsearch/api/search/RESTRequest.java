@@ -1,4 +1,4 @@
-package ru.zhambul.logsearch.api;
+package ru.zhambul.logsearch.api.search;
 
 /**
  * Created by zhambyl on 01/02/2017.

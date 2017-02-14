@@ -11,19 +11,20 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 
 /**
  * Created by zhambyl on 26/01/2017.
  */
 @Stateless
 @LocalBean
-public class DomainConfigConverter implements Converter<String, DomainConfig> {
+public class DomainConfigConverter implements Converter<Path, DomainConfig> {
 
     private final static XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 
     @Override
-    public DomainConfig convert(String filePath) {
-        try (InputStream in = new FileInputStream(filePath)) {
+    public DomainConfig convert(Path filePath) {
+        try (InputStream in = new FileInputStream(filePath.toString())) {
             XMLStreamReader streamReader = inputFactory.createXMLStreamReader(in);
 
             return parseDomainConfig(streamReader);
