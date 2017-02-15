@@ -30,7 +30,6 @@ public class LoginRESTService {
     @Path("/login")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    //todo create userAction
     public Response login(LoginRESTRequest loginRequest,
                           @Context HttpServletRequest req) {
         if (req.getRemoteUser() == null) {
@@ -46,6 +45,18 @@ public class LoginRESTService {
                     .setUserName(loginRequest.getLogin())
                     .setAction("login"));
             return Response.status(Response.Status.ACCEPTED).build();
+        }
+        return Response.status(Response.Status.OK).build();
+    }
+
+    @Path("/logout")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response logout(@Context HttpServletRequest req) {
+        try {
+            req.logout();
+        } catch (ServletException e) {
+            throw new RuntimeException(e);
         }
         return Response.status(Response.Status.OK).build();
     }
