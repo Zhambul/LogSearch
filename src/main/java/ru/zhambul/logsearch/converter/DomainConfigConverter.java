@@ -1,10 +1,8 @@
 package ru.zhambul.logsearch.converter;
 
-import ru.zhambul.logsearch.xml.DomainConfig;
-import ru.zhambul.logsearch.xml.ServerConfig;
+import ru.zhambul.logsearch.type.DomainConfig;
+import ru.zhambul.logsearch.type.ServerConfig;
 
-import javax.ejb.LocalBean;
-import javax.ejb.Stateless;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -12,12 +10,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by zhambyl on 26/01/2017.
  */
-@Stateless
-@LocalBean
 public class DomainConfigConverter implements Converter<Path, DomainConfig> {
 
     private final static XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -35,36 +33,38 @@ public class DomainConfigConverter implements Converter<Path, DomainConfig> {
     }
 
     private DomainConfig parseDomainConfig(XMLStreamReader streamReader) throws XMLStreamException {
-        DomainConfig config = new DomainConfig();
+        String domainName = null;
+        List<ServerConfig> servers = new ArrayList<>();
         while (streamReader.hasNext()) {
             if (streamReader.isStartElement()) {
                 switch (streamReader.getLocalName()) {
                     case "name":
-                        if (config.getName() == null) {
-                            config.setName(streamReader.getElementText());
+                        if (domainName == null) {
+                            domainName = streamReader.getElementText();
                         }
                         break;
 
                     case "server":
-                        config.addServer(parseServerConfig(streamReader));
+                        servers.add(parseServerConfig(streamReader));
                         break;
                 }
             }
             streamReader.next();
         }
-        return config;
+        return new DomainConfig(domainName, servers);
     }
 
     private ServerConfig parseServerConfig(XMLStreamReader streamReader) throws XMLStreamException {
-        ServerConfig serverConfig = new ServerConfig();
+        String serverName = null;
+        String clusterName = null;
         while (streamReader.hasNext()) {
             if (streamReader.isStartElement()) {
                 switch (streamReader.getLocalName()) {
                     case "name":
-                        serverConfig.setName(streamReader.getElementText());
+                        serverName = streamReader.getElementText();
                         break;
                     case "cluster":
-                        serverConfig.setCluster(streamReader.getElementText());
+                        clusterName = streamReader.getElementText();
                         break;
                 }
             }
@@ -73,6 +73,6 @@ public class DomainConfigConverter implements Converter<Path, DomainConfig> {
             }
             streamReader.next();
         }
-        return serverConfig;
+        return new ServerConfig(serverName, clusterName);
     }
 }

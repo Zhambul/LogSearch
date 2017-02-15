@@ -23,6 +23,10 @@ public class UserAction {
     @Column
     private Date timestamp;
 
+    public UserAction() {
+        timestamp = new Date(new java.util.Date().getTime());
+    }
+
     public int getId() {
         return id;
     }

@@ -6,6 +6,8 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <!-- Annotated entity classes -->
         <class>ru.zhambul.logsearch.type.UserAction</class>
+        <class>ru.zhambul.logsearch.type.UserPermission</class>
+
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <property name="hibernate.connection.url" value="jdbc:postgresql://localhost:5432/postgres"/>
@@ -16,7 +18,7 @@
 
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
-            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+            <!--<property name="hibernate.hbm2ddl.auto" value="update"/>-->
         </properties>
     </persistence-unit>
 </persistence>

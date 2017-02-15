@@ -2,36 +2,20 @@ package ru.zhambul.logsearch.converter;
 
 import ru.zhambul.logsearch.type.LogEntry;
 
-import javax.ejb.EJB;
-import javax.ejb.LocalBean;
-import javax.ejb.Stateless;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Created by zhambyl on 06/02/2017.
  */
-@Stateless
-@LocalBean
 public class InStrToLogEntriesConverter implements Converter<InputStream, List<LogEntry>> {
 
-    @EJB
-    private InStrToStringConverter in;
-
-    @EJB
-    private StringToLogEntriesConverter out;
-
+    private final InStrToStringConverter in;
+    private final StringToLogEntriesConverter out;
 
     public InStrToLogEntriesConverter() {
-    }
-
-    /*
-    * Constructor fot tests
-    * */
-    public InStrToLogEntriesConverter(InStrToStringConverter in, StringToLogEntriesConverter out) {
-        this.in = Objects.requireNonNull(in);
-        this.out = Objects.requireNonNull(out);
+        in = new InStrToStringConverter();
+        out = new StringToLogEntriesConverter();
     }
 
     @Override

@@ -2,21 +2,17 @@ package ru.zhambul.logsearch.converter;
 
 import ru.zhambul.logsearch.type.LogEntry;
 
-import javax.ejb.LocalBean;
-import javax.ejb.Stateless;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static ru.zhambul.logsearch.search.Searchable.LOG_DELIMITER;
+import static ru.zhambul.logsearch.core.Searchable.LOG_DELIMITER;
 
 /**
  * Created by zhambyl on 02/02/2017.
  */
-@Stateless
-@LocalBean
 public class StringToLogEntriesConverter implements Converter<String, List<LogEntry>> {
 
     private static final String LOG_SPLITTER = LOG_DELIMITER + LOG_DELIMITER;

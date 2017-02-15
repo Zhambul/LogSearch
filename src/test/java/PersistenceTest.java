@@ -1,5 +1,5 @@
 //import org.junit.Test;
-//import ru.zhambul.logsearch.dao.UserActionDao;
+//import ru.zhambul.logsearch.dao.UserActionDAO;
 //import ru.zhambul.logsearch.type.UserAction;
 //
 //import javax.persistence.EntityManager;
@@ -14,7 +14,7 @@
 //    @Test
 //    public void asd() {
 //        EntityManagerFactory emf = Persistence.createEntityManagerFactory("entityManager");
-//        EntityManager entityManager = emf.createEntityManager();
+//        EntityManager entityManager =  emf.createEntityManager();
 //
 //        entityManager.getTransaction().begin();
 //
@@ -31,7 +31,7 @@
 //        UserAction action = new UserAction();
 //        action.setAction("qwewqeqwe");
 //
-//        UserActionDao dao = new UserActionDao();
+//        UserActionDAO dao = new UserActionDAO();
 //        dao.save(action);
 //        UserAction action1 = dao.getById(1);
 //

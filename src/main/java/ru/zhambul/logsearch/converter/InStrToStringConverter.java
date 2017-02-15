@@ -1,7 +1,5 @@
 package ru.zhambul.logsearch.converter;
 
-import javax.ejb.LocalBean;
-import javax.ejb.Stateless;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -11,8 +9,6 @@ import java.nio.channels.ReadableByteChannel;
 /**
  * Created by zhambyl on 26/01/2017.
  */
-@Stateless
-@LocalBean
 public class InStrToStringConverter implements Converter<InputStream, String> {
 
     @Override
