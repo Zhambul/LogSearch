@@ -1,5 +1,7 @@
 package ru.zhambul.logsearch.api.rs;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.zhambul.logsearch.api.intercepror.AuthorizationInterceptor;
 import ru.zhambul.logsearch.core.FileWriter;
 import ru.zhambul.logsearch.core.SearchService;
@@ -7,7 +9,6 @@ import ru.zhambul.logsearch.dao.UserActionDAO;
 import ru.zhambul.logsearch.type.*;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -21,14 +22,13 @@ import javax.ws.rs.core.MediaType;
  * Created by zhambyl on 26/01/2017.
  */
 @Path("/search")
-@Stateless
 public class SearchRESTService {
 
     private final SearchService searchService = new SearchService();
     private final FileWriter fileWriter = new FileWriter();
     private UserActionDAO userActionDAO;
+    private final static Logger log = LoggerFactory.getLogger(SearchRESTService.class);
 
-    //todo api for all servers and clusters
     @PostConstruct
     public void init() {
         userActionDAO = new UserActionDAO();
@@ -40,6 +40,7 @@ public class SearchRESTService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Interceptors(AuthorizationInterceptor.class)
     public SearchResult text(final SearchRESTRequest request, @Context HttpServletRequest req) {
+        log.info("text search " + request + " user " + req.getRemoteUser());
         SearchQuery query = createSearchQuery(request);
         userActionDAO.save(new UserAction()
                 .setAction("text search")
@@ -54,6 +55,8 @@ public class SearchRESTService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Interceptors(AuthorizationInterceptor.class)
     public DownloadRESTResponse file(final SearchRESTRequest request, @Context HttpServletRequest req) {
+        log.info("file search " + request + " user " + req.getRemoteUser());
+
         SearchQuery query = createSearchQuery(request);
 
         userActionDAO.save(new UserAction()

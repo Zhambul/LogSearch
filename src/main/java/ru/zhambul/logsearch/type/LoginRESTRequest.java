@@ -28,7 +28,6 @@ public class LoginRESTRequest {
     public String toString() {
         return "RESTRequest{" +
                 "login='" + login + '\'' +
-                ", password='" + password + '\'' +
                 '}';
     }
 }

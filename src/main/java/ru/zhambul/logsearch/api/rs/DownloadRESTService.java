@@ -1,13 +1,13 @@
 package ru.zhambul.logsearch.api.rs;
 
-import ru.zhambul.logsearch.api.intercepror.AuthorizationInterceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.zhambul.logsearch.core.ResourceReader;
 import ru.zhambul.logsearch.dao.UserActionDAO;
 import ru.zhambul.logsearch.type.UserAction;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.LocalBean;
-import javax.interceptor.Interceptors;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -24,6 +24,7 @@ public class DownloadRESTService {
 
     private final java.nio.file.Path savePath = new ResourceReader().savePath();
     private UserActionDAO userActionDAO;
+    private final static Logger log = LoggerFactory.getLogger(DownloadRESTService.class);
 
     @PostConstruct
     public void init() {
@@ -34,13 +35,21 @@ public class DownloadRESTService {
     @Path("/{fileName}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Interceptors(AuthorizationInterceptor.class)
     public Response downloadFile(@PathParam("fileName") String fileName, @Context HttpServletRequest req) {
-        File file = savePath.resolve(fileName).toFile();
+        if (req.getRemoteUser() == null) {
+            log.info("not authenticated");
+            throw new NotAuthorizedException("Not authenticated");
+        }
+
+        log.info("file download " + fileName + " for user " + req.getRemoteUser());
+
         userActionDAO.save(new UserAction()
                 .setAction("file download")
                 .setUserName(req.getRemoteUser())
         );
+
+        File file = savePath.resolve(fileName).toFile();
+
         return Response.ok(file, MediaType.APPLICATION_OCTET_STREAM)
                 .header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"")
                 .build();

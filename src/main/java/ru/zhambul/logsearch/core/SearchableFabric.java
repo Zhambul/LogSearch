@@ -1,5 +1,7 @@
 package ru.zhambul.logsearch.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.zhambul.logsearch.converter.InStrToLogEntriesConverter;
 import ru.zhambul.logsearch.type.DomainConfig;
 import ru.zhambul.logsearch.type.SearchTargetTypeEnum;
@@ -21,6 +23,7 @@ public class SearchableFabric {
     private final DomainConfig domainConfig = DomainConfig.parse();
     private final InStrToLogEntriesConverter logEntryConverter = new InStrToLogEntriesConverter();
     private final ResourceReader resourceReader = new ResourceReader();
+    private final static Logger log = LoggerFactory.getLogger(SearchableFabric.class);
 
     public Searchable create(SearchTargetTypeEnum type, String name) {
         Objects.requireNonNull(type);
@@ -44,6 +47,8 @@ public class SearchableFabric {
             throw new IllegalArgumentException("no such domain (" + name + ")");
         }
 
+        log.info("creating domain " + name);
+
         List<Searchable> servers = domainConfig.getServers()
                 .stream()
                 .map(this::createServer)
@@ -63,6 +68,8 @@ public class SearchableFabric {
             throw new IllegalArgumentException("no such cluster (" + name + ")");
         }
 
+        log.info("creating cluster " + name);
+
         return new SearchablePool(servers);
     }
 
@@ -71,6 +78,8 @@ public class SearchableFabric {
     }
 
     private Searchable createServer(String name) {
+        log.info("creating server " + name);
+
         List<Searchable> logFiles = listLogFiles(resourceReader.serverLogsPath(name));
         return new SearchablePool(logFiles);
     }
@@ -90,6 +99,8 @@ public class SearchableFabric {
     }
 
     private Searchable createSearchFile(String path) {
+        log.info("creating searchFile with path " + path);
+
         return new SearchFile(path, logEntryConverter);
     }
 

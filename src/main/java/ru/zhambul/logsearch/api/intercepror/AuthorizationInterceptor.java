@@ -1,6 +1,8 @@
 package ru.zhambul.logsearch.api.intercepror;
 
-import ru.zhambul.logsearch.core.UserPermissionChecker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.zhambul.logsearch.core.UserPermissionService;
 import ru.zhambul.logsearch.dao.UserActionDAO;
 import ru.zhambul.logsearch.type.SearchRESTRequest;
 import ru.zhambul.logsearch.type.UserAction;
@@ -17,25 +19,33 @@ import javax.ws.rs.NotAuthorizedException;
  */
 public class AuthorizationInterceptor {
 
-    private final UserPermissionChecker userPermissionChecker = new UserPermissionChecker();
+    private final UserPermissionService userPermissionService = new UserPermissionService();
     private final UserActionDAO userActionDAO = new UserActionDAO();
+    private final static Logger log = LoggerFactory.getLogger(AuthorizationInterceptor.class);
 
     @AroundInvoke
-    public Object checkUserRole(InvocationContext invocationContext) throws Exception {
+    public Object checkPermission(InvocationContext invocationContext) throws Exception {
+        SearchRESTRequest restRequest = (SearchRESTRequest) invocationContext.getParameters()[0];
         HttpServletRequest servletRequest = (HttpServletRequest) invocationContext.getParameters()[1];
+
         String userName = servletRequest.getRemoteUser();
         if (userName == null) {
-            throw new NotAuthorizedException("Not authenticated");
+            log.info("not authenticated");
+            throw new NotAuthorizedException("not authenticated");
         }
 
-        SearchRESTRequest restRequest = (SearchRESTRequest) invocationContext.getParameters()[0];
         HttpSession session = servletRequest.getSession();
 
         Boolean granted = (Boolean) session.getAttribute(restRequest.getTargetName());
 
         if (granted == null) {
-            System.out.println("checking");
-            if (!userPermissionChecker.granted(userName, restRequest.getTargetTypeEnum(), restRequest.getTargetName())) {
+            log.info("checking permission for user " + userName + " " + restRequest);
+
+            if (!userPermissionService.granted(userName, restRequest.getTargetTypeEnum(),
+                    restRequest.getTargetName())) {
+
+                log.info("authorization fail of user " + userName + " " + restRequest);
+
                 userActionDAO.save(new UserAction()
                         .setUserName(userName)
                         .setAction("authorization fail")
@@ -44,7 +54,7 @@ public class AuthorizationInterceptor {
             }
             session.setAttribute(restRequest.getTargetName(), true);
         }
-        System.out.println("not checking");
+
         return invocationContext.proceed();
     }
 }

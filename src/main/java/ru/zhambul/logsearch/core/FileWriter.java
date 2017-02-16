@@ -4,6 +4,8 @@ import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.zhambul.logsearch.type.FileTypeEnum;
 import ru.zhambul.logsearch.type.LogEntry;
 import ru.zhambul.logsearch.type.SearchResult;
@@ -30,6 +32,7 @@ public class FileWriter {
 
     private final static XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
     private final static FopFactory fopFactory = FopFactory.newInstance(new File("").toURI());
+    private final static Logger log = LoggerFactory.getLogger(FileWriter.class);
 
     public FileWriter() {
         ResourceReader resourceReader = new ResourceReader();
@@ -38,6 +41,7 @@ public class FileWriter {
     }
 
     public String save(SearchResult searchResult, FileTypeEnum fileType) {
+        log.info("saving file to " + fileType.name());
         Objects.requireNonNull(searchResult);
         Objects.requireNonNull(fileType);
 

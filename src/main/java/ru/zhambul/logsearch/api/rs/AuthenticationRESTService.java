@@ -1,5 +1,7 @@
 package ru.zhambul.logsearch.api.rs;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.zhambul.logsearch.dao.UserActionDAO;
 import ru.zhambul.logsearch.type.LoginRESTRequest;
 import ru.zhambul.logsearch.type.UserAction;
@@ -18,9 +20,10 @@ import javax.ws.rs.core.Response;
  * Created by zhambyl on 14/02/2017.
  */
 @Path("/auth")
-public class LoginRESTService {
+public class AuthenticationRESTService {
 
     private UserActionDAO userActionDAO;
+    private final static Logger log = LoggerFactory.getLogger(AuthenticationRESTService.class);
 
     @PostConstruct
     public void init() {
@@ -36,16 +39,20 @@ public class LoginRESTService {
             try {
                 req.login(loginRequest.getLogin(), loginRequest.getPassword());
             } catch (ServletException e) {
+                log.info("authentication fail " + loginRequest);
                 userActionDAO.save(new UserAction()
                         .setUserName(loginRequest.getLogin())
                         .setAction("authentication fail"));
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
+            log.info("authentication success " + loginRequest);
+
             userActionDAO.save(new UserAction()
                     .setUserName(loginRequest.getLogin())
                     .setAction("login"));
             return Response.status(Response.Status.ACCEPTED).build();
         }
+        log.info("authentication skipped " + loginRequest);
         return Response.status(Response.Status.OK).build();
     }
 
@@ -53,6 +60,8 @@ public class LoginRESTService {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response logout(@Context HttpServletRequest req) {
+        log.info("log out" + req.getRemoteUser());
+
         try {
             req.logout();
         } catch (ServletException e) {

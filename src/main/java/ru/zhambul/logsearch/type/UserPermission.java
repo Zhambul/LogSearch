@@ -1,6 +1,10 @@
 package ru.zhambul.logsearch.type;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.sql.Date;
 
 /**
@@ -8,13 +12,17 @@ import java.sql.Date;
  */
 @Entity
 @Table(name = "user_permission")
+@Cacheable(false)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class UserPermission {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @XmlTransient
     private int id;
 
     @Column
+    @XmlTransient
     private String userName;
 
     @Column
@@ -24,6 +32,7 @@ public class UserPermission {
     private String targetName;
 
     @Transient
+    @XmlTransient
     private SearchTargetTypeEnum targetTypeEnum;
 
     public int getId() {
@@ -60,6 +69,7 @@ public class UserPermission {
 
     public void setTargetTypeEnum(SearchTargetTypeEnum targetTypeEnum) {
         this.targetTypeEnum = targetTypeEnum;
+        this.targetType = targetTypeEnum.name().toLowerCase();
     }
 
     public String getTargetName() {
