@@ -20,16 +20,6 @@ public class UserPermissionService {
     private final UserPermissionDAO userPermissionDao = new UserPermissionDAO();
     private final DomainConfig domainConfig = DomainConfig.parse();
 
-    public boolean granted(String userName, SearchTargetTypeEnum targetType, String targetName) {
-        List<UserPermission> expandedPermissions = expandedPermissions(userName);
-
-        return expandedPermissions.stream()
-                .anyMatch(it ->
-                        it.getTargetTypeEnum() == targetType &&
-                                it.getTargetName().equals(targetName)
-                );
-    }
-
     public List<UserPermission> expandedPermissions(String userName) {
         return userPermissionDao.findByUserName(userName)
                 .stream()

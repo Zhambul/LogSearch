@@ -6,13 +6,14 @@ import ru.zhambul.logsearch.core.UserPermissionService;
 import ru.zhambul.logsearch.dao.UserActionDAO;
 import ru.zhambul.logsearch.type.SearchRESTRequest;
 import ru.zhambul.logsearch.type.UserAction;
+import ru.zhambul.logsearch.type.UserPermission;
 
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.InvocationContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotAuthorizedException;
+import java.util.List;
 
 /**
  * Created by zhambyl on 14/02/2017.
@@ -29,32 +30,46 @@ public class AuthorizationInterceptor {
         HttpServletRequest servletRequest = (HttpServletRequest) invocationContext.getParameters()[1];
 
         String userName = servletRequest.getRemoteUser();
+        checkAuthentication(userName);
+
+        List<UserPermission> userPermissions = getUserPermissions(restRequest, servletRequest, userName);
+
+        if (!isGranted(restRequest, userPermissions)) {
+            log.info("authorization fail of user " + userName + " " + restRequest);
+
+            userActionDAO.save(new UserAction()
+                    .setUserName(userName)
+                    .setAction("authorization fail")
+            );
+            throw new ForbiddenException("No permission for this target");
+        }
+
+        return invocationContext.proceed();
+    }
+
+    private void checkAuthentication(String userName) {
         if (userName == null) {
             log.info("not authenticated");
             throw new NotAuthorizedException("not authenticated");
         }
+    }
 
-        HttpSession session = servletRequest.getSession();
-
-        Boolean granted = (Boolean) session.getAttribute(restRequest.getTargetName());
-
-        if (granted == null) {
-            log.info("checking permission for user " + userName + " " + restRequest);
-
-            if (!userPermissionService.granted(userName, restRequest.getTargetTypeEnum(),
-                    restRequest.getTargetName())) {
-
-                log.info("authorization fail of user " + userName + " " + restRequest);
-
-                userActionDAO.save(new UserAction()
-                        .setUserName(userName)
-                        .setAction("authorization fail")
+    private boolean isGranted(SearchRESTRequest restRequest, List<UserPermission> userPermissions) {
+        return userPermissions.stream()
+                .anyMatch(it ->
+                        it.getTargetTypeEnum() == restRequest.getTargetTypeEnum() &&
+                                it.getTargetName().equals(restRequest.getTargetName())
                 );
-                throw new ForbiddenException("No permission for this target");
-            }
-            session.setAttribute(restRequest.getTargetName(), true);
-        }
+    }
 
-        return invocationContext.proceed();
+    private List<UserPermission> getUserPermissions(SearchRESTRequest restRequest, HttpServletRequest servletRequest, String userName) {
+        List<UserPermission> userPermissions = (List<UserPermission>) servletRequest.getSession().getAttribute("permissions");
+
+        if (userPermissions == null) {
+            log.info("getting permissions for user " + userName + " " + restRequest);
+            userPermissions = userPermissionService.expandedPermissions(userName);
+            servletRequest.getSession().setAttribute("permissions", userPermissions);
+        }
+        return userPermissions;
     }
 }

@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -20,6 +21,8 @@ import javax.ws.rs.core.Response;
  * Created by zhambyl on 14/02/2017.
  */
 @Path("/auth")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class AuthenticationRESTService {
 
     private UserActionDAO userActionDAO;
@@ -32,7 +35,6 @@ public class AuthenticationRESTService {
 
     @Path("/login")
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
     public Response login(LoginRESTRequest loginRequest,
                           @Context HttpServletRequest req) {
         if (req.getRemoteUser() == null) {
@@ -58,12 +60,14 @@ public class AuthenticationRESTService {
 
     @Path("/logout")
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
     public Response logout(@Context HttpServletRequest req) {
         log.info("log out" + req.getRemoteUser());
 
         try {
             req.logout();
+            userActionDAO.save(new UserAction()
+                    .setUserName(req.getRemoteUser())
+                    .setAction("logout"));
         } catch (ServletException e) {
             throw new RuntimeException(e);
         }

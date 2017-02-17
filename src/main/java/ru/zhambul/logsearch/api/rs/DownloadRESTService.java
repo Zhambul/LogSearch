@@ -7,7 +7,6 @@ import ru.zhambul.logsearch.dao.UserActionDAO;
 import ru.zhambul.logsearch.type.UserAction;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.LocalBean;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -19,7 +18,8 @@ import java.io.File;
  * Created by zhambyl on 13/02/2017.
  */
 @Path("/download")
-@LocalBean
+@Produces(MediaType.APPLICATION_OCTET_STREAM)
+@Consumes(MediaType.APPLICATION_JSON)
 public class DownloadRESTService {
 
     private final java.nio.file.Path savePath = new ResourceReader().savePath();
@@ -33,8 +33,6 @@ public class DownloadRESTService {
 
     @GET
     @Path("/{fileName}")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    @Consumes(MediaType.APPLICATION_JSON)
     public Response downloadFile(@PathParam("fileName") String fileName, @Context HttpServletRequest req) {
         if (req.getRemoteUser() == null) {
             log.info("not authenticated");

@@ -22,6 +22,9 @@ import javax.ws.rs.core.MediaType;
  * Created by zhambyl on 26/01/2017.
  */
 @Path("/search")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+@Interceptors(AuthorizationInterceptor.class)
 public class SearchRESTService {
 
     private final SearchService searchService = new SearchService();
@@ -36,9 +39,6 @@ public class SearchRESTService {
 
     @POST
     @Path("/text")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Interceptors(AuthorizationInterceptor.class)
     public SearchResult text(final SearchRESTRequest request, @Context HttpServletRequest req) {
         log.info("text search " + request + " user " + req.getRemoteUser());
         SearchQuery query = createSearchQuery(request);
@@ -51,9 +51,6 @@ public class SearchRESTService {
 
     @POST
     @Path("/file")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Interceptors(AuthorizationInterceptor.class)
     public DownloadRESTResponse file(final SearchRESTRequest request, @Context HttpServletRequest req) {
         log.info("file search " + request + " user " + req.getRemoteUser());
 
