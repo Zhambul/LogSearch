@@ -31,6 +31,9 @@ public class UserPermission {
     @Column
     private String targetName;
 
+    @Column
+    private boolean granted;
+
     @Transient
     @XmlTransient
     private SearchTargetTypeEnum targetTypeEnum;
@@ -78,6 +81,15 @@ public class UserPermission {
 
     public void setTargetName(String targetName) {
         this.targetName = targetName;
+    }
+
+
+    public boolean isGranted() {
+        return granted;
+    }
+
+    public void setGranted(boolean granted) {
+        this.granted = granted;
     }
 
     @Override
