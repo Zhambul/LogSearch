@@ -14,13 +14,14 @@ public class UserAction {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @Column
+    @Column(nullable = false)
     private String userName;
 
-    @Column
+    @Column(nullable = false)
     private String action;
 
-    @Column
+    @Column(nullable = false)
+    //todo temporal
     private Date timestamp;
 
     public UserAction() {

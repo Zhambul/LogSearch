@@ -26,10 +26,6 @@ public class ResourceReader {
         domainPath = read("domainPath");
     }
 
-    private String read(String name) {
-        return properties.getProperty(name);
-    }
-
     public Path domainPath() {
         return Paths.get(domainPath);
     }
@@ -48,5 +44,9 @@ public class ResourceReader {
 
     public Path xslPath() {
         return Paths.get(read("xslPath"));
+    }
+
+    private String read(String name) {
+        return properties.getProperty(name);
     }
 }

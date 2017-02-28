@@ -4,6 +4,7 @@
              version="2.0">
     <persistence-unit name="entityManager" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
+
         <!-- Annotated entity classes -->
         <class>ru.zhambul.logsearch.type.UserAction</class>
         <class>ru.zhambul.logsearch.type.UserPermission</class>

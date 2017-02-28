@@ -1,8 +1,6 @@
 package ru.zhambul.logsearch.api.rs;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.zhambul.logsearch.dao.UserActionDAO;
+import ru.zhambul.logsearch.core.UserActionService;
 import ru.zhambul.logsearch.type.LoginRESTRequest;
 import ru.zhambul.logsearch.type.UserAction;
 
@@ -25,47 +23,42 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthenticationRESTService {
 
-    private UserActionDAO userActionDAO;
-    private final static Logger log = LoggerFactory.getLogger(AuthenticationRESTService.class);
+    //todo inject
+    private UserActionService userActionService;
 
     @PostConstruct
     public void init() {
-        userActionDAO = new UserActionDAO();
+        userActionService = new UserActionService();
     }
 
-    @Path("/login")
     @POST
+    @Path("/login")
     public Response login(LoginRESTRequest loginRequest,
                           @Context HttpServletRequest req) {
         if (req.getRemoteUser() == null) {
             try {
                 req.login(loginRequest.getLogin(), loginRequest.getPassword());
             } catch (ServletException e) {
-                log.info("authentication fail " + loginRequest);
-                userActionDAO.save(new UserAction()
+                userActionService.save(new UserAction()
                         .setUserName(loginRequest.getLogin())
                         .setAction("authentication fail"));
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
-            log.info("authentication success " + loginRequest);
 
-            userActionDAO.save(new UserAction()
+            userActionService.save(new UserAction()
                     .setUserName(loginRequest.getLogin())
                     .setAction("login"));
             return Response.status(Response.Status.ACCEPTED).build();
         }
-        log.info("authentication skipped " + loginRequest);
         return Response.status(Response.Status.OK).build();
     }
 
-    @Path("/logout")
     @POST
+    @Path("/logout")
     public Response logout(@Context HttpServletRequest req) {
-        log.info("log out" + req.getRemoteUser());
-
         try {
             req.logout();
-            userActionDAO.save(new UserAction()
+            userActionService.save(new UserAction()
                     .setUserName(req.getRemoteUser())
                     .setAction("logout"));
         } catch (ServletException e) {

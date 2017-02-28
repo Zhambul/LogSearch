@@ -1,31 +1,40 @@
 package ru.zhambul.logsearch.type;
 
-import java.util.Objects;
+import java.util.Date;
 
 /**
  * Created by zhambyl on 19/01/2017.
  */
 public class SearchQuery {
 
-    private SearchTargetTypeEnum targetType;
-    private String targetName;
-    private SearchParams params;
+    private String regExp;
+    private Date fromDate;
+    private Date toDate;
 
-    public SearchQuery(SearchTargetTypeEnum targetType, String targetName, SearchParams params) {
-        this.targetType = Objects.requireNonNull(targetType);
-        this.targetName = Objects.requireNonNull(targetName);
-        this.params = Objects.requireNonNull(params);
+    public String getRegExp() {
+        return regExp;
     }
 
-    public SearchTargetTypeEnum getTargetType() {
-        return targetType;
+    public SearchQuery setRegExp(String regExp) {
+        this.regExp = regExp;
+        return this;
     }
 
-    public String getTargetName() {
-        return targetName;
+    public Date getFromDate() {
+        return fromDate;
     }
 
-    public SearchParams getParams() {
-        return params;
+    public SearchQuery setFromDate(Date fromDate) {
+        this.fromDate = fromDate;
+        return this;
+    }
+
+    public Date getToDate() {
+        return toDate;
+    }
+
+    public SearchQuery setToDate(Date toDate) {
+        this.toDate = toDate;
+        return this;
     }
 }

@@ -30,8 +30,8 @@ public class SearchRESTRequest {
         this.to = to;
     }
 
-    public String getOutputType() {
-        return outputType;
+    public FileTypeEnum getOutputType() {
+        return FileTypeEnum.valueOf(outputType.toUpperCase());
     }
 
     public void setOutputType(String outputType) {
@@ -54,11 +54,7 @@ public class SearchRESTRequest {
         this.targetName = targetName;
     }
 
-    public String getTargetType() {
-        return targetType;
-    }
-
-    public SearchTargetTypeEnum getTargetTypeEnum() {
+    public SearchTargetTypeEnum getTargetType() {
         return SearchTargetTypeEnum.valueOf(targetType.toUpperCase());
     }
 
