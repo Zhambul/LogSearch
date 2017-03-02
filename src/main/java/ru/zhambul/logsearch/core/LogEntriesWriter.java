@@ -36,7 +36,6 @@ public class LogEntriesWriter {
         xslPath = resourceReader.xslPath();
     }
 
-    //todo refactor
     public String write(List<LogEntry> logEntries, FileTypeEnum fileType) {
         String fileName = generateFileName(fileType);
 
@@ -71,6 +70,8 @@ public class LogEntriesWriter {
                             throw new IllegalArgumentException("unknown file type " + fileType);
                     }
             }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

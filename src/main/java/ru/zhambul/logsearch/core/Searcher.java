@@ -16,11 +16,10 @@ import static java.util.stream.Collectors.toList;
 public class Searcher {
 
     public final static String LOG_DELIMITER = "####";
-
     private final static Runtime rt = Runtime.getRuntime();
-    private final static LogEntriesReader reader = new LogEntriesReader();
+    private final static LogEntriesParser parser = new LogEntriesParser();
 
-    protected final List<String> paths;
+    private final List<String> paths;
 
     public Searcher(List<String> paths) {
         this.paths = paths;
@@ -30,41 +29,38 @@ public class Searcher {
         return paths
                 .parallelStream()
                 .map(path -> {
-                    String cmd = createCommand(query, path);
-                    return execute(cmd, query);
+                    String cmd = createCommand(query.getRegExp(), path);
+                    List<LogEntry> logEntries = execute(cmd);
+                    return filteredByDate(logEntries, query.getFromDate(), query.getToDate());
                 })
                 .flatMap(List::stream)
                 .collect(toList());
     }
 
-    private String createCommand(SearchQuery query, String path) {
-        return "awk /" + query.getRegExp() + "/ ORS=" + LOG_DELIMITER + " " + path;
+    private String createCommand(String regExp, String path) {
+        return "awk /" + regExp + "/ ORS=" + LOG_DELIMITER + " " + path;
     }
 
-    private List<LogEntry> execute(String cmd, SearchQuery searchParams) {
+    private List<LogEntry> execute(String cmd) {
         try (InputStream inputStream = rt.exec(cmd).getInputStream()) {
-            List<LogEntry> logEntries = reader.read(inputStream);
-
-            Date from = searchParams.getFromDate();
-            Date to = searchParams.getToDate();
-
-            if (from == null && to == null) {
-                return logEntries;
-            }
-
-            return logEntries.stream()
-                    .filter(logEntry -> dateFilter(logEntry, from, to))
-                    .collect(toList());
-
+            return parser.parse(inputStream);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private boolean dateFilter(LogEntry logEntry, Date from, Date to) {
-        Date logDate = logEntry.getDate();
-        boolean after = (from == null) || logDate.after(from);
-        boolean before = (to == null) || logDate.before(to);
-        return after && before;
+    private List<LogEntry> filteredByDate(List<LogEntry> logEntries, Date from, Date to) {
+        if (from == null && to == null) {
+            return logEntries;
+        }
+
+        return logEntries.stream()
+                .filter(logEntry -> {
+                    Date logDate = logEntry.getDate();
+                    boolean after = (from == null) || logDate.after(from);
+                    boolean before = (to == null) || logDate.before(to);
+                    return after && before;
+                })
+                .collect(toList());
     }
 }

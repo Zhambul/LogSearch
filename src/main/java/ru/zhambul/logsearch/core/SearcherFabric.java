@@ -15,7 +15,7 @@ import static java.util.stream.Collectors.toList;
  */
 public class SearcherFabric {
 
-    private final DomainConfig domainConfig = DomainConfig.getInstance();
+    private final DomainConfig domainConfig = new DomainConfigParser().parse();
     private final ResourceReader resourceReader = new ResourceReader();
 
     public Searcher create(SearchTargetTypeEnum type, String name) {

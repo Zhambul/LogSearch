@@ -14,7 +14,7 @@ import java.util.List;
 @Stateless
 public class SOAPService {
 
-    private SearchService searchService = new SearchService();
+//    private SearchService searchService = new SearchService();
 
     @WebMethod(operationName = "Search")
     public List<LogEntry> search() {

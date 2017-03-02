@@ -18,15 +18,18 @@ import static ru.zhambul.logsearch.core.Searcher.LOG_DELIMITER;
 /**
  * Created by zhambyl on 06/02/2017.
  */
-public class LogEntriesReader {
+public class LogEntriesParser {
 
     private static final String LOG_SPLITTER = LOG_DELIMITER + LOG_DELIMITER;
     private static final String PAYLOAD_SPLITTER = "> <";
     private static final int TIMESTAMP_TOKEN_NUMBER = 9;
 
-    public List<LogEntry> read(InputStream inputStream) {
+    public List<LogEntry> parse(InputStream inputStream) {
         String string = readToString(inputStream);
-        return stringToLogEntries(string);
+        if (string.equals("")) {
+            return new ArrayList<>();
+        }
+        return toLogEntries(string);
     }
 
     private String readToString(InputStream stdOut) {
@@ -48,11 +51,7 @@ public class LogEntriesReader {
         }
     }
 
-    private List<LogEntry> stringToLogEntries(String input) {
-        if (input.equals("")) {
-            return new ArrayList<>();
-        }
-
+    private List<LogEntry> toLogEntries(String input) {
         return Arrays
                 .stream(input.split(LOG_SPLITTER))
                 .map(payload -> {

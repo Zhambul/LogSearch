@@ -4,4 +4,8 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
+    <security-role>
+        <role-name>Administrators</role-name>
+    </security-role>
+
 </web-app>

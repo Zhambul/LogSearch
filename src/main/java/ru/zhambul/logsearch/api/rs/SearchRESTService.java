@@ -7,7 +7,7 @@ import ru.zhambul.logsearch.core.SearcherFabric;
 import ru.zhambul.logsearch.core.UserActionService;
 import ru.zhambul.logsearch.type.*;
 
-import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.interceptor.Interceptors;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -29,12 +29,9 @@ public class SearchRESTService {
 
     private SearcherFabric fabric = new SearcherFabric();
     private final LogEntriesWriter logEntriesWriter = new LogEntriesWriter();
-    private UserActionService userActionService;
 
-    @PostConstruct
-    public void init() {
-        userActionService = new UserActionService();
-    }
+    @Inject
+    private UserActionService userActionService;
 
     @POST
     @Path("/text")
@@ -57,7 +54,7 @@ public class SearchRESTService {
 
         List<LogEntry> logEntries = getLogEntries(request);
 
-        String fileName = logEntriesWriter.write(logEntries, request.getOutputType());
+        String fileName = logEntriesWriter.write(logEntries, request.getOutputTypeEnum());
 
         return new DownloadRESTResponse().setFileName(fileName);
     }
@@ -65,7 +62,7 @@ public class SearchRESTService {
     private List<LogEntry> getLogEntries(SearchRESTRequest request) {
         SearchQuery query = new SearchQuery()
                 .setRegExp(request.getRegexp());
-        Searcher searcher = fabric.create(request.getTargetType(), request.getTargetName());
+        Searcher searcher = fabric.create(request.getTargetTypeEnum(), request.getTargetName());
         return searcher.search(query);
     }
 }

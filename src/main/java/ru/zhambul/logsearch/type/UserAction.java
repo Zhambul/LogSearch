@@ -1,31 +1,20 @@
 package ru.zhambul.logsearch.type;
 
-import javax.persistence.*;
-import java.sql.Date;
+
+import java.util.Date;
 
 /**
  * Created by zhambyl on 13/02/2017.
  */
-@Entity
-@Table(name = "user_action")
 public class UserAction {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-
-    @Column(nullable = false)
     private String userName;
-
-    @Column(nullable = false)
     private String action;
-
-    @Column(nullable = false)
-    //todo temporal
-    private Date timestamp;
+    private long timestamp;
 
     public UserAction() {
-        timestamp = new Date(new java.util.Date().getTime());
+        timestamp = new Date().getTime();
     }
 
     public int getId() {
@@ -55,12 +44,7 @@ public class UserAction {
         return this;
     }
 
-    public Date getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
-    }
-
-    public UserAction setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-        return this;
     }
 }

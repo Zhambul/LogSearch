@@ -4,7 +4,7 @@ import ru.zhambul.logsearch.core.UserActionService;
 import ru.zhambul.logsearch.type.LoginRESTRequest;
 import ru.zhambul.logsearch.type.UserAction;
 
-import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -23,13 +23,8 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthenticationRESTService {
 
-    //todo inject
+    @Inject
     private UserActionService userActionService;
-
-    @PostConstruct
-    public void init() {
-        userActionService = new UserActionService();
-    }
 
     @POST
     @Path("/login")
@@ -57,9 +52,12 @@ public class AuthenticationRESTService {
     @Path("/logout")
     public Response logout(@Context HttpServletRequest req) {
         try {
+            String remoteUser = req.getRemoteUser();
+
             req.logout();
+
             userActionService.save(new UserAction()
-                    .setUserName(req.getRemoteUser())
+                    .setUserName(remoteUser)
                     .setAction("logout"));
         } catch (ServletException e) {
             throw new RuntimeException(e);

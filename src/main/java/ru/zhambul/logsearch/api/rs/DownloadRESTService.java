@@ -1,12 +1,10 @@
 package ru.zhambul.logsearch.api.rs;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.zhambul.logsearch.core.ResourceReader;
 import ru.zhambul.logsearch.core.UserActionService;
 import ru.zhambul.logsearch.type.UserAction;
 
-import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -23,12 +21,9 @@ import java.io.File;
 public class DownloadRESTService {
 
     private final java.nio.file.Path savePath = new ResourceReader().savePath();
-    private UserActionService userActionService;
 
-    @PostConstruct
-    public void init() {
-        userActionService = new UserActionService();
-    }
+    @Inject
+    private UserActionService userActionService;
 
     @GET
     @Path("/{fileName}")
